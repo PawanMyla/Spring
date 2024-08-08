@@ -1,9 +1,12 @@
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 
 @Entity
 public class Employee {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     private String name;
     private Integer basic;
@@ -12,7 +15,8 @@ public class Employee {
     private Integer deductions;
 
     // Constructors
-    public Employee() {}
+    public Employee() {
+    }
 
     public Employee(Integer id, String name, Integer basic, Integer hra, Integer da, Integer deductions) {
         this.id = id;
@@ -24,21 +28,51 @@ public class Employee {
     }
 
     // Getters and Setters
-    public Integer getId() { return id; }
-    public void setId(Integer id) { this.id = id; }
+    public Integer getId() {
+        return id;
+    }
 
-    public String getName() { return name; }
-    public void setName(String name) { this.name = name; }
+    public void setId(Integer id) {
+        this.id = id;
+    }
 
-    public Integer getBasic() { return basic; }
-    public void setBasic(Integer basic) { this.basic = basic; }
+    public String getName() {
+        return name;
+    }
 
-    public Integer getHra() { return hra; }
-    public void setHra(Integer hra) { this.hra = hra; }
+    public void setName(String name) {
+        this.name = name;
+    }
 
-    public Integer getDa() { return da; }
-    public void setDa(Integer da) { this.da = da; }
+    public Integer getBasic() {
+        return basic;
+    }
 
-    public Integer getDeductions() { return deductions; }
-    public void setDeductions(Integer deductions) { this.deductions = deductions; }
+    public void setBasic(Integer basic) {
+        this.basic = basic;
+    }
+
+    public Integer getHra() {
+        return hra;
+    }
+
+    public void setHra(Integer hra) {
+        this.hra = hra;
+    }
+
+    public Integer getDa() {
+        return da;
+    }
+
+    public void setDa(Integer da) {
+        this.da = da;
+    }
+
+    public Integer getDeductions() {
+        return deductions;
+    }
+
+    public void setDeductions(Integer deductions) {
+        this.deductions = deductions;
+    }
 }
