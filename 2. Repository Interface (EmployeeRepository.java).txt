@@ -1,5 +1,33 @@
-import org.springframework.data.jpa.repository.JpaRepository;
+import java.util.List;
 
-public interface EmployeeRepository extends JpaRepository<Employee, Integer> {
-    Employee findByName(String name);
+public class Customer {
+    private String customerNumber;
+    private String firstName;
+    private String surname;
+    private List<PhoneDetails> phoneDetailsList;
+    private List<String> linkedAccountNumbers;
+
+    public Customer(String customerNumber, String firstName, String surname, List<PhoneDetails> phoneDetailsList, List<String> linkedAccountNumbers) {
+        this.customerNumber = customerNumber;
+        this.firstName = firstName;
+        this.surname = surname;
+        this.phoneDetailsList = phoneDetailsList;
+        this.linkedAccountNumbers = linkedAccountNumbers;
+    }
+
+    public String getCustomerNumber() {
+        return customerNumber;
+    }
+
+    public String getFullName() {
+        return surname != null && !surname.isEmpty() ? surname + " " + firstName : firstName;
+    }
+
+    public List<PhoneDetails> getPhoneDetailsList() {
+        return phoneDetailsList;
+    }
+
+    public List<String> getLinkedAccountNumbers() {
+        return linkedAccountNumbers;
+    }
 }
