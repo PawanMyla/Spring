@@ -1,23 +1,86 @@
-import org.springframework.boot.CommandLineRunner;
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.Bean;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Scanner;
+import java.util.stream.Collectors;
 
-@SpringBootApplication
-public class Application {
-
+public class Main {
     public static void main(String[] args) {
-        SpringApplication.run(Application.class, args);
-    }
+        Scanner scanner = new Scanner(System.in);
 
-    @Bean
-    CommandLineRunner runner(EmployeeService employeeService) {
-        return args -> {
-            Employee emp1 = new Employee(1, "John marquee", 50000, 10000, 5000, 2000);
-            Employee emp2 = new Employee(2, "Jane Doe", 60000, 12000, 6000, 3000);
-            // Add more employees as needed
-            employeeService.saveEmployee(emp1);
-            employeeService.saveEmployee(emp2);
-        };
+        // Single input for PhoneDetails, Accounts, and Customer
+        System.out.println("Enter primary phone number, secondary phone number, country code, and phone type (format: primaryPhone|secondaryPhone|countryCode|phoneType): ");
+        String[] phoneInput = scanner.nextLine().split("\\|");
+        String primaryPhone = phoneInput[0];
+        String secondaryPhone = phoneInput[1];
+        String countryCode = phoneInput[2].isEmpty() ? "+91" : phoneInput[2]; // Default to "+91" if blank
+        String phoneType = phoneInput[3];
+
+        PhoneDetails phoneDetails = new PhoneDetails(primaryPhone, secondaryPhone, countryCode, phoneType);
+
+        // Input accounts using a single scanner call
+        System.out.print("Enter number of accounts: ");
+        int numberOfAccounts = Integer.parseInt(scanner.nextLine());
+        List<Account> accounts = new ArrayList<>();
+
+        System.out.println("Enter account details (format: accountNumber|currentBalance|productCode|productModes): ");
+        for (int i = 0; i < numberOfAccounts; i++) {
+            String[] accountDetails = scanner.nextLine().split("\\|");
+            String accountNumber = accountDetails[0];
+            double currentBalance = Double.parseDouble(accountDetails[1]);
+            String productCode = accountDetails[2];
+            List<String> productModes = Arrays.asList(accountDetails[3].split(","));
+
+            accounts.add(new Account(accountNumber, currentBalance, productCode, productModes));
+        }
+
+        // Input customer details with linked accounts
+        System.out.println("Enter customer details and linked accounts (format: customerNumber|firstName|surname|linkedAccountNumbers): ");
+        String[] customerDetails = scanner.nextLine().split("\\|");
+        String customerNumber = customerDetails[0];
+        String firstName = customerDetails[1];
+        String surname = customerDetails[2];
+        List<String> linkedAccountNumbers = Arrays.asList(customerDetails[3].split(","));
+
+        // Create customer object with linked accounts and phone details
+        Customer customer = new Customer(customerNumber, firstName, surname, Arrays.asList(phoneDetails), linkedAccountNumbers);
+
+        // Display customer information
+        System.out.println("Customer Number: " + customer.getCustomerNumber());
+        System.out.println("Full Name: " + customer.getFullName());
+
+        // Collect and display all linked account numbers from both the customer and account lists using flatMap
+        List<String> allLinkedAccountNumbers = accounts.stream()
+                .flatMap(account -> customer.getLinkedAccountNumbers().stream())
+                .distinct()
+                .collect(Collectors.toList());
+        System.out.println("Linked Account Numbers: " + allLinkedAccountNumbers);
+
+        // Check if any linked accounts match with the accounts provided
+        List<Account> matchedAccounts = accounts.stream()
+                .filter(account -> customer.getLinkedAccountNumbers().contains(account.getAccountNumber()))
+                .collect(Collectors.toList());
+
+        // Display the matched accounts' details
+        if (!matchedAccounts.isEmpty()) {
+            System.out.println("Matched Accounts:");
+            matchedAccounts.forEach(account -> {
+                System.out.println("Matched Account Number: " + account.getAccountNumber());
+                System.out.println("Product Code: " + account.getProductCode());
+                System.out.println("Current Balance: " + account.getCurrentBalance());
+                System.out.println("Product Modes: " + account.getProductModeList());
+            });
+        } else {
+            System.out.println("No linked accounts matched the existing accounts.");
+        }
+
+        // Collect and display all product modes from the accounts using flatMap
+        List<String> allProductModes = accounts.stream()
+                .flatMap(account -> account.getProductModeList().stream())
+                .collect(Collectors.toList());
+        System.out.println("All Product Modes: " + allProductModes);
+
+        // Close the scanner
+        scanner.close();
     }
 }
