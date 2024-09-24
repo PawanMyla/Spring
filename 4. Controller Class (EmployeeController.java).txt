@@ -1,31 +1,75 @@
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
-
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Scanner;
+import java.util.stream.Collectors;
 
-@RestController
-@RequestMapping("/employees")
-public class EmployeeController {
+public class Main {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
 
-    @Autowired
-    private EmployeeService employeeService;
+        // Sample data for PhoneDetails
+        System.out.print("Enter primary phone number: ");
+        String primaryPhone = scanner.nextLine();
+        System.out.print("Enter secondary phone number: ");
+        String secondaryPhone = scanner.nextLine();
+        System.out.print("Enter country code (default +91 will be used if left blank): ");
+        String countryCode = scanner.nextLine();
+        System.out.print("Enter phone type (Primary/Secondary): ");
+        String phoneType = scanner.nextLine();
 
-    @PostMapping("/add")
-    public void addEmployees() {
-        Employee emp1 = new Employee(1, "John marquee", 50000, 10000, 5000, 2000);
-        Employee emp2 = new Employee(2, "Jane Doe", 60000, 12000, 6000, 3000);
-        // Add more employees as needed
-        employeeService.saveEmployee(emp1);
-        employeeService.saveEmployee(emp2);
-    }
+        PhoneDetails phoneDetails1 = new PhoneDetails(primaryPhone, secondaryPhone, countryCode.isEmpty() ? null : countryCode, phoneType);
 
-    @GetMapping("/{name}")
-    public Employee getEmployee(@PathVariable String name) {
-        return employeeService.getEmployeeByName(name);
-    }
+        // Sample data for Accounts
+        List<Account> accounts = new ArrayList<>();
+        System.out.print("Enter number of accounts to create: ");
+        int numberOfAccounts = Integer.parseInt(scanner.nextLine());
 
-    @GetMapping("/all")
-    public List<Employee> getAllEmployees() {
-        return employeeService.getAllEmployees();
+        for (int i = 0; i < numberOfAccounts; i++) {
+            System.out.print("Enter account details for Account " + (i + 1) + " (format: accountNumber|currentBalance|productCode|productModes): ");
+            String[] accountDetails = scanner.nextLine().split("\\|");
+            String accountNumber = accountDetails[0];
+            double currentBalance = Double.parseDouble(accountDetails[1]);
+            String productCode = accountDetails[2];
+            List<String> productModes = Arrays.asList(accountDetails[3].split(","));
+
+            accounts.add(new Account(accountNumber, currentBalance, productCode, productModes));
+        }
+
+        // Sample data for Customer with linked account numbers
+        System.out.print("Enter customer details (format: customerNumber|firstName|surname|linkedAccountNumbers): ");
+        String[] customerDetails = scanner.nextLine().split("\\|");
+        String customerNumber = customerDetails[0];
+        String firstName = customerDetails[1];
+        String surname = customerDetails[2];
+        List<String> linkedAccountNumbers = Arrays.asList(customerDetails[3].split(","));
+
+        // Create Customer object with linked account numbers
+        Customer customer = new Customer(customerNumber, firstName, surname, Arrays.asList(phoneDetails1), linkedAccountNumbers);
+
+        // Process and Output Data
+        System.out.println("Customer Number: " + customer.getCustomerNumber());
+        System.out.println("Full Name: " + customer.getFullName());
+
+        // Check if linked accounts in Customer match any account in the system
+        List<Account> matchedAccounts = accounts.stream()
+                .filter(account -> customer.getLinkedAccountNumbers().contains(account.getAccountNumber()))
+                .collect(Collectors.toList());
+
+        // Display the matched accounts' details
+        if (!matchedAccounts.isEmpty()) {
+            System.out.println("Matched Accounts:");
+            matchedAccounts.forEach(account -> {
+                System.out.println("Matched Account Number: " + account.getAccountNumber());
+                System.out.println("Product Code: " + account.getProductCode());
+                System.out.println("Current Balance: " + account.getCurrentBalance());
+                System.out.println("Product Modes: " + account.getProductModeList());
+            });
+        } else {
+            System.out.println("No linked accounts matched the existing accounts.");
+        }
+
+        // Close the scanner
+        scanner.close();
     }
 }
