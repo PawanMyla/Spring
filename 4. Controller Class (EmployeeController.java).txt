@@ -8,25 +8,23 @@ public class Main {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
 
-        // Sample data for PhoneDetails
-        System.out.print("Enter primary phone number: ");
-        String primaryPhone = scanner.nextLine();
-        System.out.print("Enter secondary phone number: ");
-        String secondaryPhone = scanner.nextLine();
-        System.out.print("Enter country code (default +91 will be used if left blank): ");
-        String countryCode = scanner.nextLine();
-        System.out.print("Enter phone type (Primary/Secondary): ");
-        String phoneType = scanner.nextLine();
+        // Single input for all PhoneDetails, Accounts, and Customer
+        System.out.println("Enter primary phone number, secondary phone number, country code, and phone type (format: primaryPhone|secondaryPhone|countryCode|phoneType): ");
+        String[] phoneInput = scanner.nextLine().split("\\|");
+        String primaryPhone = phoneInput[0];
+        String secondaryPhone = phoneInput[1];
+        String countryCode = phoneInput[2].isEmpty() ? "+91" : phoneInput[2]; // Default to "+91" if blank
+        String phoneType = phoneInput[3];
 
-        PhoneDetails phoneDetails1 = new PhoneDetails(primaryPhone, secondaryPhone, countryCode.isEmpty() ? null : countryCode, phoneType);
+        PhoneDetails phoneDetails = new PhoneDetails(primaryPhone, secondaryPhone, countryCode, phoneType);
 
-        // Sample data for Accounts
-        List<Account> accounts = new ArrayList<>();
-        System.out.print("Enter number of accounts to create: ");
+        // Input accounts with a single scanner call
+        System.out.print("Enter number of accounts: ");
         int numberOfAccounts = Integer.parseInt(scanner.nextLine());
+        List<Account> accounts = new ArrayList<>();
 
+        System.out.println("Enter account details (format: accountNumber|currentBalance|productCode|productModes): ");
         for (int i = 0; i < numberOfAccounts; i++) {
-            System.out.print("Enter account details for Account " + (i + 1) + " (format: accountNumber|currentBalance|productCode|productModes): ");
             String[] accountDetails = scanner.nextLine().split("\\|");
             String accountNumber = accountDetails[0];
             double currentBalance = Double.parseDouble(accountDetails[1]);
@@ -36,22 +34,22 @@ public class Main {
             accounts.add(new Account(accountNumber, currentBalance, productCode, productModes));
         }
 
-        // Sample data for Customer with linked account numbers
-        System.out.print("Enter customer details (format: customerNumber|firstName|surname|linkedAccountNumbers): ");
+        // Input customer details and linked accounts
+        System.out.println("Enter customer details and linked accounts (format: customerNumber|firstName|surname|linkedAccountNumbers): ");
         String[] customerDetails = scanner.nextLine().split("\\|");
         String customerNumber = customerDetails[0];
         String firstName = customerDetails[1];
         String surname = customerDetails[2];
         List<String> linkedAccountNumbers = Arrays.asList(customerDetails[3].split(","));
 
-        // Create Customer object with linked account numbers
-        Customer customer = new Customer(customerNumber, firstName, surname, Arrays.asList(phoneDetails1), linkedAccountNumbers);
+        // Create customer object with linked accounts and phone details
+        Customer customer = new Customer(customerNumber, firstName, surname, Arrays.asList(phoneDetails), linkedAccountNumbers);
 
-        // Process and Output Data
+        // Display customer information
         System.out.println("Customer Number: " + customer.getCustomerNumber());
         System.out.println("Full Name: " + customer.getFullName());
 
-        // Check if linked accounts in Customer match any account in the system
+        // Check if any linked accounts match the accounts list
         List<Account> matchedAccounts = accounts.stream()
                 .filter(account -> customer.getLinkedAccountNumbers().contains(account.getAccountNumber()))
                 .collect(Collectors.toList());
