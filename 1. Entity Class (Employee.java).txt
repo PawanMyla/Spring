@@ -1,78 +1,31 @@
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
+import java.util.List;
 
-@Entity
-public class Employee {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
-    private String name;
-    private Integer basic;
-    private Integer hra;
-    private Integer da;
-    private Integer deductions;
+public class Account {
+    private String accountNumber;
+    private double currentBalance;
+    private String productCode;
+    private List<String> productModeList;
 
-    // Constructors
-    public Employee() {
+    public Account(String accountNumber, double currentBalance, String productCode, List<String> productModeList) {
+        this.accountNumber = accountNumber;
+        this.currentBalance = currentBalance;
+        this.productCode = productCode;
+        this.productModeList = productModeList;
     }
 
-    public Employee(Integer id, String name, Integer basic, Integer hra, Integer da, Integer deductions) {
-        this.id = id;
-        this.name = name;
-        this.basic = basic;
-        this.hra = hra;
-        this.da = da;
-        this.deductions = deductions;
+    public String getAccountNumber() {
+        return accountNumber;
     }
 
-    // Getters and Setters
-    public Integer getId() {
-        return id;
+    public double getCurrentBalance() {
+        return currentBalance;
     }
 
-    public void setId(Integer id) {
-        this.id = id;
+    public String getProductCode() {
+        return productCode;
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public Integer getBasic() {
-        return basic;
-    }
-
-    public void setBasic(Integer basic) {
-        this.basic = basic;
-    }
-
-    public Integer getHra() {
-        return hra;
-    }
-
-    public void setHra(Integer hra) {
-        this.hra = hra;
-    }
-
-    public Integer getDa() {
-        return da;
-    }
-
-    public void setDa(Integer da) {
-        this.da = da;
-    }
-
-    public Integer getDeductions() {
-        return deductions;
-    }
-
-    public void setDeductions(Integer deductions) {
-        this.deductions = deductions;
+    public List<String> getProductModeList() {
+        return productModeList;
     }
 }
