@@ -1,25 +1,25 @@
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+public class PhoneDetails {
+    private String primaryNumber;
+    private String secondaryNumber;
+    private String countryCode;
+    private String phoneType; // "Primary" or "Secondary"
 
-import java.util.List;
-
-@Service
-public class EmployeeService {
-
-    @Autowired
-    private EmployeeRepository employeeRepository;
-
-    @Transactional
-    public void saveEmployee(Employee employee) {
-        employeeRepository.save(employee);
+    public PhoneDetails(String primaryNumber, String secondaryNumber, String countryCode, String phoneType) {
+        this.primaryNumber = primaryNumber;
+        this.secondaryNumber = secondaryNumber;
+        this.countryCode = countryCode != null ? countryCode : "+91"; // Add default country code
+        this.phoneType = phoneType;
     }
 
-    public Employee getEmployeeByName(String name) {
-        return employeeRepository.findByName(name);
+    public String getPrimaryNumber() {
+        return countryCode + " " + primaryNumber;
     }
 
-    public List<Employee> getAllEmployees() {
-        return employeeRepository.findAll();
+    public String getSecondaryNumber() {
+        return countryCode + " " + secondaryNumber;
+    }
+
+    public String getPhoneType() {
+        return phoneType;
     }
 }
