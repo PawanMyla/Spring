@@ -1,25 +1,33 @@
 public class PhoneDetails {
     private String primaryNumber;
     private String secondaryNumber;
-    private String countryCode;
-    private String phoneType; // "Primary" or "Secondary"
+    private String primaryCountryCode;
+    private String secondaryCountryCode;
+    private String primaryPhoneType;
+    private String secondaryPhoneType;
 
-    public PhoneDetails(String primaryNumber, String secondaryNumber, String countryCode, String phoneType) {
+    public PhoneDetails(String primaryNumber, String secondaryNumber, String primaryCountryCode, String secondaryCountryCode, String primaryPhoneType, String secondaryPhoneType) {
         this.primaryNumber = primaryNumber;
         this.secondaryNumber = secondaryNumber;
-        this.countryCode = countryCode != null ? countryCode : "+91"; // Add default country code
-        this.phoneType = phoneType;
+        this.primaryCountryCode = Optional.ofNullable(primaryCountryCode).orElse("+91"); // Default to "+91" if not provided
+        this.secondaryCountryCode = Optional.ofNullable(secondaryCountryCode).orElse("+91"); // Default to "+91" if not provided
+        this.primaryPhoneType = primaryPhoneType;
+        this.secondaryPhoneType = secondaryPhoneType;
     }
 
     public String getPrimaryNumber() {
-        return countryCode + " " + primaryNumber;
+        return primaryCountryCode + " " + primaryNumber;
     }
 
     public String getSecondaryNumber() {
-        return countryCode + " " + secondaryNumber;
+        return secondaryCountryCode + " " + secondaryNumber;
     }
 
-    public String getPhoneType() {
-        return phoneType;
+    public String getPrimaryPhoneType() {
+        return primaryPhoneType;
+    }
+
+    public String getSecondaryPhoneType() {
+        return secondaryPhoneType;
     }
 }
