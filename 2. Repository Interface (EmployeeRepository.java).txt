@@ -1,4 +1,5 @@
 import java.util.List;
+import java.util.Optional;
 
 public class Customer {
     private String customerNumber;
@@ -20,7 +21,10 @@ public class Customer {
     }
 
     public String getFullName() {
-        return surname != null && !surname.isEmpty() ? surname + " " + firstName : firstName;
+        return Optional.ofNullable(surname)
+                .filter(s -> !s.isEmpty())
+                .map(s -> s + " " + Optional.ofNullable(firstName).orElse(""))
+                .orElse(Optional.ofNullable(firstName).orElse("Unknown"));
     }
 
     public List<PhoneDetails> getPhoneDetailsList() {
