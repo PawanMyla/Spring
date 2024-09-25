@@ -8,17 +8,20 @@ public class Main {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
 
-        // Single input for PhoneDetails, Accounts, and Customer
-        System.out.println("Enter primary phone number, secondary phone number, country code, and phone type (format: primaryPhone|secondaryPhone|countryCode|phoneType): ");
+        // Input for PhoneDetails, including secondary country code and phone type
+        System.out.println("Enter primary phone, secondary phone, primary country code, secondary country code, primary phone type, secondary phone type (format: primaryPhone|secondaryPhone|primaryCountryCode|secondaryCountryCode|primaryPhoneType|secondaryPhoneType): ");
         String[] phoneInput = scanner.nextLine().split("\\|");
         String primaryPhone = phoneInput[0];
         String secondaryPhone = phoneInput[1];
-        String countryCode = phoneInput[2].isEmpty() ? "+91" : phoneInput[2]; // Default to "+91" if blank
-        String phoneType = phoneInput[3];
+        String primaryCountryCode = phoneInput[2]; // This will be handled in PhoneDetails with Optional logic
+        String secondaryCountryCode = phoneInput[3]; // This will be handled in PhoneDetails with Optional logic
+        String primaryPhoneType = phoneInput[4];
+        String secondaryPhoneType = phoneInput[5];
 
-        PhoneDetails phoneDetails = new PhoneDetails(primaryPhone, secondaryPhone, countryCode, phoneType);
+        // Create a PhoneDetails object
+        PhoneDetails phoneDetails = new PhoneDetails(primaryPhone, secondaryPhone, primaryCountryCode, secondaryCountryCode, primaryPhoneType, secondaryPhoneType);
 
-        // Input accounts using a single scanner call
+        // Input accounts
         System.out.print("Enter number of accounts: ");
         int numberOfAccounts = Integer.parseInt(scanner.nextLine());
         List<Account> accounts = new ArrayList<>();
@@ -34,20 +37,20 @@ public class Main {
             accounts.add(new Account(accountNumber, currentBalance, productCode, productModes));
         }
 
-        // Input customer details with linked accounts
+        // Input customer details with optional handling for surname and first name
         System.out.println("Enter customer details and linked accounts (format: customerNumber|firstName|surname|linkedAccountNumbers): ");
         String[] customerDetails = scanner.nextLine().split("\\|");
         String customerNumber = customerDetails[0];
-        String firstName = customerDetails[1];
-        String surname = customerDetails[2];
+        String firstName = customerDetails[1]; // Will use Optional in Customer class
+        String surname = customerDetails[2];   // Will use Optional in Customer class
         List<String> linkedAccountNumbers = Arrays.asList(customerDetails[3].split(","));
 
-        // Create customer object with linked accounts and phone details
+        // Create a Customer object with linked accounts and phone details
         Customer customer = new Customer(customerNumber, firstName, surname, Arrays.asList(phoneDetails), linkedAccountNumbers);
 
         // Display customer information
         System.out.println("Customer Number: " + customer.getCustomerNumber());
-        System.out.println("Full Name: " + customer.getFullName());
+        System.out.println("Full Name: " + customer.getFullName()); // Uses Optional logic for full name
 
         // Check if any linked accounts match with the accounts provided
         List<Account> matchedAccounts = accounts.stream()
