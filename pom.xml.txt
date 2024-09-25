@@ -1,83 +1,91 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
-    <groupId>com.example</groupId>
-    <artifactId>spring-hibernate-example</artifactId>
-    <version>1.0.0</version>
-    <packaging>jar</packaging>
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Scanner;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
-    <name>spring-hibernate-example</name>
-    <description>Spring Boot Application with Hibernate and MySQL</description>
+public class Main {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
 
-    <parent>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.7.0</version>
-        <relativePath/> <!-- lookup parent from repository -->
-    </parent>
+        // Input for PhoneDetails, including secondary country code and phone type
+        System.out.println("Enter primary phone, secondary phone, primary country code, secondary country code, primary phone type, secondary phone type (format: primaryPhone|secondaryPhone|primaryCountryCode|secondaryCountryCode|primaryPhoneType|secondaryPhoneType): ");
+        String[] phoneInput = scanner.nextLine().split("\\|");
+        String primaryPhone = phoneInput[0];
+        String secondaryPhone = phoneInput[1];
+        String primaryCountryCode = phoneInput[2];
+        String secondaryCountryCode = phoneInput[3];
+        String primaryPhoneType = phoneInput[4];
+        String secondaryPhoneType = phoneInput[5];
 
-    <properties>
-        <java.version>17</java.version>
-        <spring-boot.version>2.7.0</spring-boot.version>
-    </properties>
+        // Create a PhoneDetails object
+        PhoneDetails phoneDetails = new PhoneDetails(primaryPhone, secondaryPhone, primaryCountryCode, secondaryCountryCode, primaryPhoneType, secondaryPhoneType);
 
-    <dependencies>
-        <!-- Spring Boot Starter Web -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
-        </dependency>
+        // Input accounts
+        System.out.print("Enter number of accounts: ");
+        int numberOfAccounts = Integer.parseInt(scanner.nextLine());
+        List<Account> accounts = new ArrayList<>();
 
-        <!-- Spring Boot Starter Data JPA -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-jpa</artifactId>
-        </dependency>
+        System.out.println("Enter account details (format: accountNumber|currentBalance|productCode|productModes): ");
 
-        <!-- MySQL Driver -->
-        <dependency>
-            <groupId>mysql</groupId>
-            <artifactId>mysql-connector-java</artifactId>
-            <scope>runtime</scope>
-        </dependency>
+        // Using IntStream to read account inputs and forEach to process them
+        IntStream.range(0, numberOfAccounts).forEach(i -> {
+            String accountInput = scanner.nextLine(); // Read input for each account
+            String[] accountDetails = accountInput.split("\\|");
+            String accountNumber = accountDetails[0];
+            double currentBalance = Double.parseDouble(accountDetails[1]);
+            String productCode = accountDetails[2];
+            List<String> productModes = Arrays.asList(accountDetails[3].split(","));
+            accounts.add(new Account(accountNumber, currentBalance, productCode, productModes));
+        });
 
-        <!-- Lombok (Optional) -->
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <version>1.18.22</version>
-            <scope>provided</scope>
-        </dependency>
+        // Input customer details
+        System.out.println("Enter customer details and linked accounts (format: customerNumber|firstName|surname|linkedAccountNumbers): ");
+        String[] customerDetails = scanner.nextLine().split("\\|");
+        String customerNumber = customerDetails[0];
+        String firstName = customerDetails[1]; // Will use Optional in Customer class
+        String surname = customerDetails[2];   // Will use Optional in Customer class
+        List<String> linkedAccountNumbers = Arrays.asList(customerDetails[3].split(","));
 
-        <!-- Spring Boot Starter Test -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-test</artifactId>
-            <scope>test</scope>
-        </dependency>
-    </dependencies>
+        // Create a Customer object with linked accounts and phone details
+        Customer customer = new Customer(customerNumber, firstName, surname, Arrays.asList(phoneDetails), linkedAccountNumbers);
 
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
-            </plugin>
-        </plugins>
-    </build>
+        // Display customer information
+        System.out.println("Customer Number: " + customer.getCustomerNumber());
+        System.out.println("Full Name: " + customer.getFullName());
 
-    <repositories>
-        <repository>
-            <id>central</id>
-            <url>https://repo.maven.apache.org/maven2</url>
-        </repository>
-    </repositories>
+        // Display phone numbers
+        System.out.println("Primary Phone Number: " + phoneDetails.getPrimaryNumber());
+        System.out.println("Secondary Phone Number: " + phoneDetails.getSecondaryNumber());
 
-    <pluginRepositories>
-        <pluginRepository>
-            <id>central</id>
-            <url>https://repo.maven.apache.org/maven2</url>
-        </pluginRepository>
-    </pluginRepositories>
+        // Check if any linked accounts match with the accounts provided
+        List<Account> matchedAccounts = accounts.stream()
+                .filter(account -> customer.getLinkedAccountNumbers().contains(account.getAccountNumber()))
+                .collect(Collectors.toList());
 
-</project>
+        // Display the matched accounts' details
+        if (!matchedAccounts.isEmpty()) {
+            System.out.println("Matched Accounts:");
+            matchedAccounts.forEach(account -> {
+                System.out.println("Matched Account Number: " + account.getAccountNumber());
+                System.out.println("Product Code: " + account.getProductCode());
+                System.out.println("Current Balance: " + account.getCurrentBalance());
+                System.out.println("Product Modes: " + account.getProductModeList());
+            });
+        } else {
+            System.out.println("No linked accounts matched the existing accounts.");
+        }
+
+        // Collect and display all product modes from the accounts using flatMap
+        List<String> allProductModes = accounts.stream()
+                .flatMap(account -> account.getProductModeList().stream())
+                .distinct()
+                .collect(Collectors.toList());
+
+        System.out.println("All Product Modes: " + allProductModes);
+
+        // Close the scanner
+        scanner.close();
+    }
+}
